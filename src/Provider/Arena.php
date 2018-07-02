@@ -2,11 +2,14 @@
 
 namespace Unitedworldwrestling\OAuth2\Client\Provider;
 
+use Unitedworldwrestling\OAuth2\Client\Grant\ArenaApiKey;
+
 use InvalidArgumentException;
+use League\OAuth2\Client\Grant\GrantFactory;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
-use League\OAuth2\Client\Provider\AbstractProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class Arena extends AbstractProvider
@@ -16,17 +19,7 @@ class Arena extends AbstractProvider
     /**
      * @var string
      */
-    private $urlAuthorize;
-
-    /**
-     * @var string
-     */
-    private $urlAccessToken;
-
-    /**
-     * @var string
-     */
-    private $urlResourceOwnerDetails;
+    private $baseUrl;
 
     /**
      * @var string
@@ -41,7 +34,7 @@ class Arena extends AbstractProvider
     /**
      * @var array|null
      */
-    private $scopes = null;
+    private $scopes = ['read'];
 
     /**
      * @var string
@@ -64,11 +57,6 @@ class Arena extends AbstractProvider
     private $responseResourceOwnerId = 'id';
 
     /**
-     * @var string
-     */
-    protected $apiKey;
-
-    /**
      * @param array $options
      * @param array $collaborators
      */
@@ -85,6 +73,12 @@ class Arena extends AbstractProvider
 
         // Remove all options that are only used locally
         $options = array_diff_key($options, $configured);
+
+        if (empty($collaborators['grantFactory'])) {
+            $collaborators['grantFactory'] = new GrantFactory();
+            $collaborators['grantFactory']->setGrant('https://arena.uww.io/grants/api_key', new ArenaApiKey);
+        }
+        $this->setGrantFactory($collaborators['grantFactory']);
 
         parent::__construct($options, $collaborators);
     }
@@ -115,9 +109,7 @@ class Arena extends AbstractProvider
     protected function getRequiredOptions()
     {
         return [
-            'urlAuthorize',
-            'urlAccessToken',
-            'urlResourceOwnerDetails',
+            'baseUrl',
         ];
     }
 
@@ -144,7 +136,8 @@ class Arena extends AbstractProvider
      */
     public function getBaseAuthorizationUrl()
     {
-        return $this->urlAuthorize;
+        // Not used
+        return $this->baseUrl.'/oauth/v2/auth';
     }
 
     /**
@@ -152,7 +145,7 @@ class Arena extends AbstractProvider
      */
     public function getBaseAccessTokenUrl(array $params)
     {
-        return $this->urlAccessToken;
+        return $this->baseUrl.'/oauth/v2/token';
     }
 
     /**
@@ -160,7 +153,7 @@ class Arena extends AbstractProvider
      */
     public function getResourceOwnerDetailsUrl(AccessToken $token)
     {
-        return $this->urlResourceOwnerDetails;
+        return $this->baseUrl.'/api/json/profile';
     }
 
     /**
@@ -170,33 +163,6 @@ class Arena extends AbstractProvider
     {
         return $this->scopes;
     }
-
-    /**
-     * Requests an access token using a specified grant and option set.
-     *
-     * @param  mixed $grant
-     * @param  array $options
-     * @return AccessToken
-     */
-    // public function getAccessToken($grant, array $options = [])
-    // {
-    //     $grant = $this->verifyGrant($grant);
-
-    //     $params = [
-    //         'client_id'     => $this->clientId,
-    //         'client_secret' => $this->clientSecret,
-    //         'api_key'       => $this->apiKey,
-    //         'redirect_uri'  => $this->redirectUri,
-    //     ];
-
-    //     $params   = $grant->prepareRequestParameters($params, $options);
-    //     $request  = $this->getAccessTokenRequest($params);
-    //     $response = $this->getParsedResponse($request);
-    //     $prepared = $this->prepareAccessTokenResponse($response);
-    //     $token    = $this->createAccessToken($prepared, $grant);
-
-    //     return $token;
-    // }
 
     /**
      * @inheritdoc
@@ -212,14 +178,6 @@ class Arena extends AbstractProvider
     protected function getAccessTokenResourceOwnerId()
     {
         return $this->accessTokenResourceOwnerId ?: parent::getAccessTokenResourceOwnerId();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getScopeSeparator()
-    {
-        return $this->scopeSeparator ?: parent::getScopeSeparator();
     }
 
     /**
