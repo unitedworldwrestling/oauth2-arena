@@ -1,0 +1,14 @@
+{
+    "name": "unitedworldwrestling/oauth2-arena",
+    "description": "Arena OAuth 2.0 Client Provider for The PHP League OAuth2-Client",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "require": {
+        "league/oauth2-client": "^2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Unitedworldwrestling\\OAuth2\\Client\\": "src/"
+        }
+    }
+}
