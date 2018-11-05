@@ -4,7 +4,8 @@
     "license": "MIT",
     "minimum-stability": "stable",
     "require": {
-        "league/oauth2-client": "^2.3"
+        "league/oauth2-client": "^2.3",
+        "paragonie/random_compat": "2.*"
     },
     "autoload": {
         "psr-4": {
