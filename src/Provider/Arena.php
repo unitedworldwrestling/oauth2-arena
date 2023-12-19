@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use League\OAuth2\Client\Grant\GrantFactory;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -134,7 +135,7 @@ class Arena extends AbstractProvider
     /**
      * @inheritdoc
      */
-    public function getBaseAuthorizationUrl()
+    public function getBaseAuthorizationUrl(): string
     {
         // Not used
         return $this->baseUrl.'/oauth/v2/auth';
@@ -143,7 +144,7 @@ class Arena extends AbstractProvider
     /**
      * @inheritdoc
      */
-    public function getBaseAccessTokenUrl(array $params)
+    public function getBaseAccessTokenUrl(array $params): string
     {
         return $this->baseUrl.'/oauth/v2/token';
     }
@@ -151,7 +152,7 @@ class Arena extends AbstractProvider
     /**
      * @inheritdoc
      */
-    public function getResourceOwnerDetailsUrl(AccessToken $token)
+    public function getResourceOwnerDetailsUrl(AccessToken $token): string
     {
         return $this->baseUrl.'/api/json/profile';
     }
@@ -159,7 +160,7 @@ class Arena extends AbstractProvider
     /**
      * @inheritdoc
      */
-    public function getDefaultScopes()
+    public function getDefaultScopes(): array
     {
         return $this->scopes;
     }
@@ -167,7 +168,7 @@ class Arena extends AbstractProvider
     /**
      * @inheritdoc
      */
-    protected function getAccessTokenMethod()
+    protected function getAccessTokenMethod(): string
     {
         return $this->accessTokenMethod ?: parent::getAccessTokenMethod();
     }
@@ -175,7 +176,7 @@ class Arena extends AbstractProvider
     /**
      * @inheritdoc
      */
-    protected function getAccessTokenResourceOwnerId()
+    protected function getAccessTokenResourceOwnerId(): ?string
     {
         return $this->accessTokenResourceOwnerId ?: parent::getAccessTokenResourceOwnerId();
     }
@@ -183,7 +184,7 @@ class Arena extends AbstractProvider
     /**
      * @inheritdoc
      */
-    protected function checkResponse(ResponseInterface $response, $data)
+    protected function checkResponse(ResponseInterface $response, $data): void
     {
         if (!empty($data[$this->responseError])) {
             $error = $data[$this->responseError];
@@ -201,7 +202,7 @@ class Arena extends AbstractProvider
     /**
      * @inheritdoc
      */
-    protected function createResourceOwner(array $response, AccessToken $token)
+    protected function createResourceOwner(array $response, AccessToken $token): ResourceOwnerInterface
     {
         return new ArenaResourceOwner($response, $this->responseResourceOwnerId);
     }

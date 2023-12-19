@@ -14,7 +14,7 @@ class ArenaApiKey extends AbstractGrant
     /**
      * @inheritdoc
      */
-    protected function getName()
+    protected function getName(): string
     {
         return 'https://arena.uww.io/grants/api_key';
     }
@@ -22,7 +22,7 @@ class ArenaApiKey extends AbstractGrant
     /**
      * @inheritdoc
      */
-    protected function getRequiredRequestParameters()
+    protected function getRequiredRequestParameters(): array
     {
         return [
             'api_key',
